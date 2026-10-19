@@ -3,14 +3,22 @@ package com.codezee.taskmanager.service;
 import com.codezee.taskmanager.model.Task;
 import com.codezee.taskmanager.model.TaskStatus;
 import com.codezee.taskmanager.repository.TaskRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class TaskService {
+
+    private static final int DEFAULT_PAGE_SIZE = 20;
+    private static final int MAX_PAGE_SIZE = 100;
 
     private final TaskRepository taskRepository;
 
@@ -20,6 +28,30 @@ public class TaskService {
 
     public List<Task> findAll() {
         return taskRepository.findAll();
+    }
+
+    public Page<Task> findFiltered(
+            TaskStatus status,
+            LocalDate dueBefore,
+            LocalDate dueAfter,
+            int page,
+            int size) {
+        if (page < 0) {
+            page = 0;
+        }
+        if (size <= 0) {
+            size = DEFAULT_PAGE_SIZE;
+        }
+        if (size > MAX_PAGE_SIZE) {
+            size = MAX_PAGE_SIZE;
+        }
+        if (dueBefore != null && dueAfter != null && dueAfter.isAfter(dueBefore)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "dueAfter cannot be after dueBefore");
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dueDate").ascending().and(Sort.by("id")));
+        return taskRepository.findFiltered(status, dueBefore, dueAfter, pageable);
     }
 
     public Task findById(Long id) {
