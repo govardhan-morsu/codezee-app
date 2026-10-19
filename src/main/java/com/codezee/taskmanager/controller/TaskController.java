@@ -1,7 +1,10 @@
 package com.codezee.taskmanager.controller;
 
+import com.codezee.taskmanager.dto.TaskRequest;
 import com.codezee.taskmanager.model.Task;
+import com.codezee.taskmanager.model.TaskStatus;
 import com.codezee.taskmanager.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,19 +39,24 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        Task created = taskService.create(task);
+    public ResponseEntity<Task> createTask(@Valid @RequestBody TaskRequest request) {
+        Task created = taskService.create(toEntity(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id, @RequestBody Task task) {
-        return taskService.update(id, task);
+    public Task updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequest request) {
+        return taskService.update(id, toEntity(request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private Task toEntity(TaskRequest request) {
+        TaskStatus status = request.getStatus() != null ? request.getStatus() : TaskStatus.TODO;
+        return new Task(request.getTitle(), request.getDescription(), status, request.getDueDate());
     }
 }
