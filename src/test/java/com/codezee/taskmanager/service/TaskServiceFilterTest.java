@@ -102,4 +102,15 @@ class TaskServiceFilterTest {
         assertEquals(20, pageableCaptor.getValue().getPageSize());
         assertEquals(1, pageableCaptor.getValue().getPageNumber());
     }
+
+    @Test
+    void findFiltered_allowsEqualDueBeforeAndDueAfter() {
+        LocalDate day = LocalDate.of(2026, 11, 15);
+        when(taskRepository.findFiltered(isNull(), eq(day), eq(day), any(Pageable.class)))
+                .thenReturn(Page.empty());
+
+        taskService.findFiltered(null, day, day, 0, 20);
+
+        verify(taskRepository).findFiltered(isNull(), eq(day), eq(day), any(Pageable.class));
+    }
 }
