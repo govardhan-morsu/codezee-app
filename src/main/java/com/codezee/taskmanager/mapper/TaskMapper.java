@@ -6,6 +6,9 @@ import com.codezee.taskmanager.model.Task;
 import com.codezee.taskmanager.model.TaskStatus;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converts between task entities and request/response DTOs.
+ */
 @Component
 public class TaskMapper {
 
