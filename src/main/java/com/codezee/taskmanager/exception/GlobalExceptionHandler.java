@@ -11,6 +11,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * Maps common request failures to a consistent {@link ApiError} JSON body.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
