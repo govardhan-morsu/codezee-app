@@ -48,6 +48,24 @@ curl -X POST http://localhost:8080/api/tasks \
 - `status` — `TODO` | `IN_PROGRESS` | `DONE` (defaults to `TODO`)
 - `dueDate` — `YYYY-MM-DD`
 
+### Filtering & pagination
+
+`GET /api/tasks` now accepts optional query params:
+
+| Param | Type | Notes |
+|-------|------|-------|
+| `status` | `TODO` / `IN_PROGRESS` / `DONE` | filter by status |
+| `dueBefore` | `YYYY-MM-DD` | due date on or before |
+| `dueAfter` | `YYYY-MM-DD` | due date on or after |
+| `page` | int | zero-based, default `0` |
+| `size` | int | default `20`, max `100` |
+
+Response is a page object: `content`, `page`, `size`, `totalElements`, `totalPages`.
+
+```bash
+curl "http://localhost:8080/api/tasks?status=TODO&dueBefore=2026-12-31&page=0&size=10"
+```
+
 ## Tests
 
 ```bash
